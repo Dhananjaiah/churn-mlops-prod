@@ -30,9 +30,7 @@ _model_meta: Dict[str, Any] = {}
 
 
 def _get_config() -> Dict[str, Any]:
-    cfg_path = os.getenv(CONFIG_PATH_ENV)
-    if cfg_path:
-        return load_config(cfg_path)
+    # load_config() already reads from CHURN_MLOPS_CONFIG env var
     return load_config()
 
 
