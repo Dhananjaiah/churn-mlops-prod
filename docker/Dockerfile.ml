@@ -15,11 +15,11 @@ COPY requirements ./requirements
 COPY pyproject.toml README.md ./
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir --target=/install \
+    pip install --no-cache-dir \
     -r requirements/base.txt \
     -r requirements/dev.txt && \
     if [ -f requirements/serving.txt ]; then \
-      pip install --no-cache-dir --target=/install -r requirements/serving.txt; \
+      pip install --no-cache-dir -r requirements/serving.txt; \
     fi
 
 # Stage 2: Runtime
@@ -34,8 +34,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
-# Copy Python packages from builder
-COPY --from=builder /install /usr/local/lib/python3.10/site-packages
+# Copy Python packages from builder (entire site-packages to preserve paths)
+COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code
 COPY src ./src
