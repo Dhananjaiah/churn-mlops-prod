@@ -59,8 +59,8 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: churn-mlops-config
+            name: {{ .Values.configMap.name }}
         - name: mlops-storage
           persistentVolumeClaim:
-            claimName: churn-mlops-pvc
+            claimName: {{ .Values.pvc.name }}
 {{- end }}

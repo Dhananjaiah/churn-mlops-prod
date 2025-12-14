@@ -26,6 +26,13 @@ pvc:
     - ReadWriteOnce
   size: 10Gi
 
+# Optional: Separate PVC for ML workloads (if needed in future)
+# mlPvc:
+#   name: churn-mlops-ml-staging
+#   accessModes:
+#     - ReadWriteOnce
+#   size: 20Gi
+
 # ConfigMap configuration
 configMap:
   name: churn-mlops-config-staging
@@ -33,7 +40,7 @@ configMap:
 # Service configuration
 service:
   name: churn-mlops-api-staging
-  port: 80
+  port: 8000  # Changed from 80 to match Dockerfile
   type: ClusterIP
 
 # Resource configuration
