@@ -30,28 +30,23 @@ spec:
           imagePullPolicy: {{ .Values.images.api.pullPolicy }}
           ports:
             - containerPort: {{ .Values.service.port }}
-
           env:
             - name: CHURN_MLOPS_CONFIG
               value: /app/config/config.yaml
-
           resources:
             {{- toYaml .Values.resources.api | nindent 12 }}
-
           livenessProbe:
             httpGet:
               path: /live
               port: {{ .Values.service.port }}
             initialDelaySeconds: 10
             periodSeconds: 20
-
           readinessProbe:
             httpGet:
               path: /ready
               port: {{ .Values.service.port }}
             initialDelaySeconds: 5
             periodSeconds: 10
-
           volumeMounts:
             - name: mlops-storage
               mountPath: /app/data
@@ -62,7 +57,6 @@ spec:
             - name: config
               mountPath: /app/config/config.yaml
               subPath: config.yaml
-
       volumes:
         - name: config
           configMap:
