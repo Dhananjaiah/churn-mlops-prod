@@ -1,12 +1,12 @@
 images:
   api:
     repository: techitfactory/churn-api
-    tag: ""
+    tag: "latest"
     pullPolicy: IfNotPresent
 
   ml:
     repository: techitfactory/churn-ml
-    tag: ""
+    tag: "latest"
     pullPolicy: IfNotPresent
 
   busybox:

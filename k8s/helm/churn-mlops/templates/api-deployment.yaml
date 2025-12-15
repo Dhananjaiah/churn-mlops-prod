@@ -23,11 +23,10 @@ spec:
           volumeMounts:
             - name: mlops-storage
               mountPath: /pvc
-
       containers:
         - name: churn-api
           image: {{ include "churn-mlops.apiImage" . }}
-          imagePullPolicy: {{ .Values.images.api.pullPolicy }}
+          imagePullPolicy: {{ .Values.images.api.pullPolicy | quote }}
           ports:
             - containerPort: {{ .Values.service.port }}
           env:
