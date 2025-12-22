@@ -95,8 +95,13 @@ jobs:
           TAG: ${{ steps.meta.outputs.version }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "GH_TOKEN not set; skipping manifest bump" && exit 0
+          fi
+          echo "Using GH_TOKEN to push manifests (repo: Dhananjaiah/churn-mlops-prod, actor: $(git config user.name || true))"
           git config user.name "gha-bot"
           git config user.email "gha-bot@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/Dhananjaiah/churn-mlops-prod.git
           yq -i '(.spec.template.spec.containers[] | select(.name=="churn-api").image) = "techitfactory/churn-api:'"$TAG"'"' k8s/api-deployment.yaml
           yq -i '(.spec.jobTemplate.spec.template.spec.containers[] | select(.name=="churn-ml").image) = "techitfactory/churn-ml:'"$TAG"'"' k8s/batch-cronjob.yaml
           yq -i '(.spec.jobTemplate.spec.template.spec.containers[] | select(.name=="churn-ml").image) = "techitfactory/churn-ml:'"$TAG"'"' k8s/drift-cronjob.yaml
