@@ -1,4 +1,4 @@
-name: ci-cd
+name: CI/CD (Docker Hub + Argo)
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
     tags: [ "v*" ]
 
 jobs:
-  test:
+  test-and-lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,13 +23,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements/dev.txt
 
+      - name: Install package (editable)
+        run: |
+          pip install -e .
+
       - name: Lint and test
         run: |
           make lint
           make test
 
   build-and-push:
-    needs: test
+    needs: test-and-lint
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
