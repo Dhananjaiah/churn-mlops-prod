@@ -78,20 +78,25 @@ jobs:
           push: true
           tags: techitfactory/churn-api:${{ steps.meta.outputs.version }}
 
-      # Optional: bump manifests with the new tag and push back to main.
-      # Uncomment and ensure GH_TOKEN has repo write if you want auto tag bumps.
-      # - name: Bump k8s manifests to new tag
-      #   if: github.ref == 'refs/heads/main'
-      #   env:
-      #     TAG: ${{ steps.meta.outputs.version }}
-      #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      #   run: |
-      #     git config user.name "gha-bot"
-      #     git config user.email "gha-bot@users.noreply.github.com"
-      #     yq -i '(.spec.template.spec.containers[] | select(.name=="churn-api").image) = "techitfactory/churn-api:'"$TAG"'"' k8s/api-deployment.yaml
-      #     yq -i '(.spec.jobTemplate.spec.template.spec.containers[] | select(.name=="churn-ml").image) = "techitfactory/churn-ml:'"$TAG"'"' k8s/batch-cronjob.yaml
-      #     yq -i '(.spec.jobTemplate.spec.template.spec.containers[] | select(.name=="churn-ml").image) = "techitfactory/churn-ml:'"$TAG"'"' k8s/drift-cronjob.yaml
-      #     yq -i '(.spec.jobTemplate.spec.template.spec.containers[] | select(.name=="churn-ml").image) = "techitfactory/churn-ml:'"$TAG"'"' k8s/retrain-cronjob.yaml
-      #     git add k8s/api-deployment.yaml k8s/batch-cronjob.yaml k8s/drift-cronjob.yaml k8s/retrain-cronjob.yaml
-      #     git commit -m "chore: deploy tag $TAG" || exit 0
-      #     git push origin main
+      # Auto-bump manifests to the new image tag and push to main so Argo syncs
+      - name: Install yq
+        if: github.ref == 'refs/heads/main'
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Bump k8s manifests to new tag
+        if: github.ref == 'refs/heads/main'
+        env:
+          TAG: ${{ steps.meta.outputs.version }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          git config user.name "gha-bot"
+          git config user.email "gha-bot@users.noreply.github.com"
+          yq -i '(.spec.template.spec.containers[] | select(.name=="churn-api").image) = "techitfactory/churn-api:'"$TAG"'"' k8s/api-deployment.yaml
+          yq -i '(.spec.jobTemplate.spec.template.spec.containers[] | select(.name=="churn-ml").image) = "techitfactory/churn-ml:'"$TAG"'"' k8s/batch-cronjob.yaml
+          yq -i '(.spec.jobTemplate.spec.template.spec.containers[] | select(.name=="churn-ml").image) = "techitfactory/churn-ml:'"$TAG"'"' k8s/drift-cronjob.yaml
+          yq -i '(.spec.jobTemplate.spec.template.spec.containers[] | select(.name=="churn-ml").image) = "techitfactory/churn-ml:'"$TAG"'"' k8s/retrain-cronjob.yaml
+          git add k8s/api-deployment.yaml k8s/batch-cronjob.yaml k8s/drift-cronjob.yaml k8s/retrain-cronjob.yaml
+          git commit -m "chore: deploy tag $TAG" || exit 0
+          git push origin main
