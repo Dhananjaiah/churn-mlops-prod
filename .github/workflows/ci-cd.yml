@@ -6,6 +6,9 @@ on:
     branches: [ main ]
     tags: [ "v*" ]
 
+permissions:
+  contents: write
+
 jobs:
   test-and-lint:
     runs-on: ubuntu-latest
@@ -92,13 +95,13 @@ jobs:
       - name: Bump k8s manifests to new tag
         if: github.ref == 'refs/heads/main'
         env:
-          TAG: ${{ steps.meta.outputs.version }}
+          TAG: ${{ steps.meta.outputs.sha }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           if [ -z "$GH_TOKEN" ]; then
             echo "GH_TOKEN not set; skipping manifest bump" && exit 0
           fi
-          echo "Using GH_TOKEN to push manifests (repo: Dhananjaiah/churn-mlops-prod, actor: $(git config user.name || true))"
+          echo "Using GH_TOKEN to push manifests (repo: Dhananjaiah/churn-mlops-prod)"
           git config user.name "gha-bot"
           git config user.email "gha-bot@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/Dhananjaiah/churn-mlops-prod.git
@@ -108,4 +111,4 @@ jobs:
           yq -i '(.spec.jobTemplate.spec.template.spec.containers[] | select(.name=="churn-ml").image) = "techitfactory/churn-ml:'"$TAG"'"' k8s/retrain-cronjob.yaml
           git add k8s/api-deployment.yaml k8s/batch-cronjob.yaml k8s/drift-cronjob.yaml k8s/retrain-cronjob.yaml
           git commit -m "chore: deploy tag $TAG" || exit 0
-          git push origin main
+          git push origin HEAD:main
