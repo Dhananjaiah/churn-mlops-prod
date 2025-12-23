@@ -7,7 +7,8 @@ spec:
   description: Production MLOps Project
   
   sourceRepos:
-    - https://github.com/yourusername/churn-mlops-prod.git
+    - https://github.com/Dhananjaiah/churn-mlops-prod.git
+    - https://github.com/techitfactory/churn-mlops-prod.git
   
   destinations:
     - namespace: churn-mlops-production
