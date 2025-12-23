@@ -306,7 +306,9 @@ Shell wrappers for common operations (all use `set -e` for fail-fast).
 | `course-notes/section-10-ci-cd-quality.md` | Linting, testing, pre-commit hooks |
 | `course-notes/section-11-containerization-deploy.md` | Docker images, Kubernetes manifests |
 | `course-notes/section-12-monitoring-retrain.md` | Drift detection, score proxy, automated retraining |
+| `course-notes/section-12a-prometheus-monitoring-retrain.md` | Prometheus Operator, ServiceMonitor, PrometheusRule, drift alerts |
 | `course-notes/section-13-capstone-runbook.md` | End-to-end operations, troubleshooting |
+| `course-notes/final-notes-end-to-end.md` | Full pipeline walkthrough (data → train → score → monitor → retrain) |
 | `course-notes/file-index.md` | This file (complete file reference) |
 
 ---
@@ -403,4 +405,5 @@ k8s/drift-cronjob.yaml  (uses ML image)
 
 - **[README.md](README.md)**: Main project README
 - **[Section 00](section-00-overview.md)**: System architecture overview
+- **[Final Notes (End to End)](final-notes-end-to-end.md)**: Full pipeline walkthrough
 - **[Section 13](section-13-capstone-runbook.md)**: Operational runbook

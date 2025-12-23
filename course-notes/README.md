@@ -42,6 +42,7 @@ A real-world churn prediction system for **TechITFactory**, an e-learning portal
 | [12](section-12-monitoring-retrain.md) | **Monitoring & Retrain** | Drift detection, automated retraining |
 | [12A](section-12a-prometheus-monitoring-retrain.md) | **Prometheus Monitoring & Alerts** | Prometheus Operator, ServiceMonitor, PrometheusRule, drift alerts |
 | [13](section-13-capstone-runbook.md) | **Capstone Runbook** | End-to-end workflows & troubleshooting |
+| [Final](final-notes-end-to-end.md) | **Final Notes (End to End)** | Full pipeline walkthrough (data → train → score → monitor → retrain) |
 
 ---
 

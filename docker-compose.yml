@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   churn-api:
     build:
@@ -33,8 +31,9 @@ services:
     volumes:
       - ./artifacts:/app/artifacts
       - ./data:/app/data
-    entrypoint: ["bash", "-lc"]
-    command: ["bash"]
+    # Default CMD from image is "bash" for interactive use.
+    # Importantly: leaving entrypoint unset allows `docker compose run churn-ml python -m ...`
+    # to work as expected.
 
   # One-off seeding job (local equivalent of the K8s seed job).
   # Run:
@@ -47,8 +46,9 @@ services:
     volumes:
       - ./artifacts:/app/artifacts
       - ./data:/app/data
-    entrypoint: ["bash", "-lc"]
     command:
+      - bash
+      - -lc
       - |
         set -e
         mkdir -p /app/data/raw /app/data/processed /app/data/features /app/data/predictions
