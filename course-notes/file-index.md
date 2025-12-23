@@ -179,6 +179,7 @@ Shell wrappers for common operations (all use `set -e` for fail-fast).
 | `k8s/ml-scripts-configmap.yaml` | Scripts as ConfigMap (alternative approach) |
 | `k8s/api-metrics-annotations-patch.yaml` | Prometheus scrape config for API |
 | `k8s/monitoring/servicemonitor.yaml` | Prometheus ServiceMonitor (if using Prometheus Operator) |
+| `k8s/monitoring/prometheus-rules.yaml` | PrometheusRule alerts (API health + drift job failure) |
 
 ### Plain YAML (Validated Approach)
 

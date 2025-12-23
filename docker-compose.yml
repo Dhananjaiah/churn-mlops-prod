@@ -11,3 +11,74 @@ services:
     volumes:
       - ./artifacts:/app/artifacts
       - ./data:/app/data
+    # In local demos we want the container to stay up even before a model exists.
+    # /ready (and /health) require a production model; /live does not.
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    depends_on:
+      - prometheus
+
+  # ML container (interactive) — use to run drift/retrain commands manually.
+  churn-ml:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ml
+    # Bind mounts use host filesystem permissions. Running as your host UID/GID
+    # avoids PermissionError when writing to ./data or ./artifacts.
+    user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./data:/app/data
+    entrypoint: ["bash", "-lc"]
+    command: ["bash"]
+
+  # One-off seeding job (local equivalent of the K8s seed job).
+  # Run:
+  #   docker compose run --rm seed-model
+  seed-model:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ml
+    user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./data:/app/data
+    entrypoint: ["bash", "-lc"]
+    command:
+      - |
+        set -e
+        mkdir -p /app/data/raw /app/data/processed /app/data/features /app/data/predictions
+        mkdir -p /app/artifacts/models /app/artifacts/metrics /app/artifacts/registry /app/artifacts/reports
+        ./scripts/generate_data.sh
+        ./scripts/prepare_data.sh
+        ./scripts/build_features.sh
+        ./scripts/build_labels.sh
+        ./scripts/build_training_set.sh
+        ./scripts/train_baseline.sh
+        ./scripts/promote_model.sh
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./monitoring/grafana-provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus

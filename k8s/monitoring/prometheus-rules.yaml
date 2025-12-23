@@ -1,0 +1,52 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: churn-mlops-alerts
+  namespace: churn-mlops
+  labels:
+    # Must match your kube-prometheus-stack release label (common default if installed as:
+    # helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring
+    release: prometheus
+spec:
+  groups:
+    - name: churn_api_alerts
+      rules:
+        - alert: ChurnApiHighErrorRate
+          expr: |
+            sum(rate(churn_api_requests_total{status=~"5.."}[5m]))
+            /
+            sum(rate(churn_api_requests_total[5m]))
+            > 0.05
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "High 5xx error rate on Churn API"
+            description: "5xx error ratio > 5% for 5m"
+
+        - alert: ChurnApiHighLatencyP95
+          expr: |
+            histogram_quantile(
+              0.95,
+              sum by (le) (rate(churn_api_request_latency_seconds_bucket[5m]))
+            ) > 1.0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High p95 latency on Churn API"
+            description: "p95 latency > 1s for 5m"
+
+        # Drift CronJob creates Jobs named like: churn-drift-daily-<timestamp>
+        # This relies on kube-state-metrics being installed (included in kube-prometheus-stack).
+        - alert: ChurnDataDriftJobFailed
+          expr: |
+            max_over_time(
+              kube_job_status_failed{namespace="churn-mlops", job_name=~"churn-drift-.*"}[30m]
+            ) > 0
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Data drift check job failed"
+            description: "Drift check Job has failures in last 30m"

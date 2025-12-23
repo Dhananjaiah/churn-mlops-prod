@@ -40,6 +40,7 @@ A real-world churn prediction system for **TechITFactory**, an e-learning portal
 | [10](section-10-ci-cd-quality.md) | **CI/CD & Quality** | Linting, testing, code quality |
 | [11](section-11-containerization-deploy.md) | **Containerization & Deploy** | Docker, Kubernetes manifests |
 | [12](section-12-monitoring-retrain.md) | **Monitoring & Retrain** | Drift detection, automated retraining |
+| [12A](section-12a-prometheus-monitoring-retrain.md) | **Prometheus Monitoring & Alerts** | Prometheus Operator, ServiceMonitor, PrometheusRule, drift alerts |
 | [13](section-13-capstone-runbook.md) | **Capstone Runbook** | End-to-end workflows & troubleshooting |
 
 ---
